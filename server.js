@@ -4,9 +4,7 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const app = express();
 app.use(express.static("public"));
-app.listen(3000, () => {
-  console.log("Servidor corriendo en http://localhost:3000");
-});
+
 
 // Configuración de multer para recibir imágenes
 const storage = multer.memoryStorage();
