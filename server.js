@@ -2,16 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
+const cors = require("cors");
+
 const app = express();
-app.use(express.static("public"));
-
-
-// Configuración de multer para recibir imágenes
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
+app.use(cors());
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 app.post("/send", upload.array("images", 2), async (req, res) => {
   const { name, email, address, message } = req.body;
@@ -55,4 +54,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
 
