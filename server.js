@@ -33,6 +33,7 @@ app.post("/send", upload.array("images", 2), async (req, res) => {
       <p><strong>Nombre:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Dirección:</strong> ${address}</p>
+      <p><strong>Servicio:</strong> ${service}</p>
       <p><strong>Mensaje:</strong> ${message}</p>
     `,
     attachments: files.map((file) => ({
@@ -43,10 +44,10 @@ app.post("/send", upload.array("images", 2), async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    res.send("✅ Formulario enviado correctamente.");
+    res.send("✅ Form sent correctly.");
   } catch (err) {
     console.error(err);
-    res.status(500).send("❌ Error al enviar el formulario.");
+    res.status(500).send("❌ Error sending the form.");
   }
 });
 
@@ -54,5 +55,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
-
-
