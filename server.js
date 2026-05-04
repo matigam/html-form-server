@@ -12,8 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.post("/send", upload.array("images", 2), async (req, res) => {
-  const { name, email, address, message } = req.body;
+app.post("/send", upload.array("images", 5), async (req, res) => {
+  const { name, email, phone, address, service, message } = req.body;
   const files = req.files;
 
   const transporter = nodemailer.createTransport({
@@ -25,17 +25,19 @@ app.post("/send", upload.array("images", 2), async (req, res) => {
   });
 
   const mailOptions = {
-    from: email,
+    from: process.env.EMAIL_USER,
+    replyTo: email,
     to: "styurwall@gmail.com",
-    subject: "Nueva consulta desde el formulario",
+    subject: "New quote request from website",
     html: `
-      <h3>Datos recibidos:</h3>
-      <p><strong>Nombre:</strong> ${name}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Dirección:</strong> ${address}</p>
-      <p><strong>Servicio:</strong> ${service}</p>
-      <p><strong>Mensaje:</strong> ${message}</p>
-    `,
+    <h3>New quote request</h3>
+    <p><strong>Name:</strong> ${name}</p>
+    <p><strong>Email:</strong> ${email}</p>
+    <p><strong>Phone:</strong> ${phone}</p>
+    <p><strong>Address:</strong> ${address}</p>
+    <p><strong>Service:</strong> ${service}</p>
+    <p><strong>Message:</strong> ${message}</p>
+  `,
     attachments: files.map((file) => ({
       filename: file.originalname,
       content: file.buffer,
@@ -46,12 +48,12 @@ app.post("/send", upload.array("images", 2), async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.send("✅ Form sent correctly.");
   } catch (err) {
-    console.error(err);
+    console.error("❌ Email send failed:", err.response || err.message || err);
     res.status(500).send("❌ Error sending the form.");
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
