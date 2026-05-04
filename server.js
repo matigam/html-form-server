@@ -4,6 +4,15 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const cors = require("cors");
 
+const { google } = require("googleapis");
+
+const auth = new google.auth.GoogleAuth({
+  keyFile: "credentials.json",
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+});
+
+const sheets = google.sheets({ version: "v4", auth });
+
 const app = express();
 app.use(cors());
 app.use(express.static("public"));
@@ -46,6 +55,26 @@ app.post("/send", upload.array("images", 5), async (req, res) => {
 
   try {
     await transporter.sendMail(mailOptions);
+    const spreadsheetId = "1n6IRttIaTsKFQNlamGIKSzSjExNZRMCnKYeeJcNeWKk";
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: "Sheet1!A:G",
+      valueInputOption: "USER_ENTERED",
+      requestBody: {
+        values: [
+          [
+            name,
+            email,
+            phone,
+            address,
+            service,
+            message,
+            new Date().toLocaleString(),
+          ],
+        ],
+      },
+    });
     res.send("✅ Form sent correctly.");
   } catch (err) {
     console.error("❌ Email send failed:", err.response || err.message || err);
